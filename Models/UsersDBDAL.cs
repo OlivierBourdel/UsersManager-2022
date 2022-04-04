@@ -108,13 +108,14 @@ namespace UsersManager.Models
 
         public static bool RemoveUser(this UsersDBEntities DB, int userId)
         {
-            User userToDelete = DB.Users.Find(userId);
-            if (userToDelete != null)
+            User user = DB.Users.Find(userId);
+            if (user != null)
             {
-                OnlineUsers.RemoveUser(userToDelete.Id);
-                userToDelete.RemoveAvatar();
+                user.RemoveAvatar();
+                User userToDelete = DB.Users.Find(user.Id);
                 DB.Users.Remove(userToDelete);
                 DB.SaveChanges();
+                OnlineUsers.RenewSerialNumber();
                 return true;
             }
             return false;
@@ -135,7 +136,7 @@ namespace UsersManager.Models
 
         public static IEnumerable<User> SortedUsers(this UsersDBEntities DB)
         {
-            return DB.Users.OrderBy(u => u.FirstName).ThenBy(u => u.LastName);
+            return DB.Users.OrderBy(u => u.LastName).ThenBy(u => u.FirstName);
         }
 
         public static bool Verify_User(this UsersDBEntities DB, int userId, int code)
@@ -165,7 +166,7 @@ namespace UsersManager.Models
 
         public static UnverifiedEmail Add_UnverifiedEmail(this UsersDBEntities DB, int userId, string email)
         {
-
+      
             UnverifiedEmail unverifiedEmail = new UnverifiedEmail() { UserId = userId, Email = email, VerificationCode = DateTime.Now.Millisecond };
             unverifiedEmail = DB.UnverifiedEmails.Add(unverifiedEmail);
             DB.SaveChanges();
@@ -215,40 +216,25 @@ namespace UsersManager.Models
             return false;
         }
 
-        public static Login AddLogin(this UsersDBEntities DB, int userId)
+        public static Login Add_Login(this UsersDBEntities DB, int userId)
         {
-            Login login = new Login();
-            login.LoginDate = login.LogoutDate = DateTime.Now;
-            login.UserId = userId;
-            login = DB.Logins.Add(login);
+            Login login = DB.Logins.Add(new Login(userId));
             DB.SaveChanges();
+
             return login;
         }
 
-        public static bool UpdateLogout(this UsersDBEntities DB, int loginId)
+        public static Login Update_Login(this UsersDBEntities DB, int userId)
         {
-            Login login = DB.Logins.Find(loginId);
-            if (login != null)
+            Login login = DB.Logins.OrderByDescending(l => l.LoginDate).FirstOrDefault(l => l.UserId == userId);
+            if(login != null)
             {
                 login.LogoutDate = DateTime.Now;
                 DB.Entry(login).State = EntityState.Modified;
                 DB.SaveChanges();
-                return true;
             }
-            return false;
-        }
 
-        public static bool UpdateLogoutByUserId(this UsersDBEntities DB, int userId)
-        {
-            Login login = DB.Logins.Where(l => l.UserId == userId).OrderByDescending(l => l.LoginDate).FirstOrDefault();
-            if (login != null)
-            {
-                login.LogoutDate = DateTime.Now;
-                DB.Entry(login).State = EntityState.Modified;
-                DB.SaveChanges();
-                return true;
-            }
-            return false;
+            return login;
         }
 
         public static bool DeleteLoginsJournalDay(this UsersDBEntities DB, DateTime day)
@@ -258,141 +244,5 @@ namespace UsersManager.Models
             DB.SaveChanges();
             return true;
         }
-
-        public static FriendShip Add_FiendShipRequest(this UsersDBEntities DB, int userId, int targetUserId)
-        {
-            User user = DB.Users.Find(userId);
-            User targetUser = DB.FindUser(targetUserId);
-            if (user != null && targetUser != null)
-            {
-                BeginTransaction(DB);
-                DB.Remove_FiendShipRequest(userId, targetUserId);
-                FriendShip friendShip = new FriendShip();
-                friendShip.UserId = user.Id;
-                friendShip.TargetUserId = targetUser.Id;
-                friendShip.CreationDate = DateTime.Now;
-                friendShip.Accepted = false;
-                friendShip.Declined = false;
-                friendShip = DB.FriendShips.Add(friendShip);
-                DB.SaveChanges();
-                Commit();
-                return friendShip;
-            }
-            return null;
-        }
-        public static bool Remove_FiendShipRequest(this UsersDBEntities DB, int userId, int targetUserId)
-        {
-            User user = DB.Users.Find(userId);
-            User targetUser = DB.FindUser(targetUserId);
-            if (user != null && targetUser != null)
-            {
-                DB.FriendShips.RemoveRange(DB.FriendShips.Where(f => f.UserId == userId && f.TargetUserId == targetUserId));
-                DB.FriendShips.RemoveRange(DB.FriendShips.Where(f => f.UserId == targetUserId && f.TargetUserId == userId));
-                DB.SaveChanges();
-            }
-            return true;
-        }
-        public static bool Accept_FriendShip(this UsersDBEntities DB, int userId, int targetUserId)
-        {
-            FriendShip friendShip = DB.FriendShips.Where(f => (f.UserId == userId && f.TargetUserId == targetUserId)).FirstOrDefault();
-            if (friendShip != null)
-            {
-                friendShip.Accepted = true;
-                DB.Entry(friendShip).State = EntityState.Modified;
-                DB.SaveChanges();
-                return true;
-            }
-            return false;
-        }
-        public static bool Decline_FriendShip(this UsersDBEntities DB, int userId, int targetUserId)
-        {
-            FriendShip friendShip = DB.FriendShips.Where(f => (f.UserId == userId && f.TargetUserId == targetUserId)).FirstOrDefault();
-            if (friendShip != null)
-            {
-                friendShip.Declined = true;
-                DB.Entry(friendShip).State = EntityState.Modified;
-                DB.SaveChanges();
-                return true;
-            }
-            return false;
-        }
-        public static bool AreFriends(this UsersDBEntities DB, int userId, int targetUserId)
-        {
-            FriendShip friendShip = DB.FriendShips.Where(f => (f.UserId == userId && f.TargetUserId == targetUserId)).FirstOrDefault();
-            if (friendShip != null)
-            {
-                return friendShip.Accepted;
-            }
-            friendShip = DB.FriendShips.Where(f => (f.UserId == targetUserId && f.TargetUserId == userId)).FirstOrDefault();
-            if (friendShip != null)
-            {
-                return friendShip.Accepted;
-            }
-            return false;
-        }
-        public static bool FriendShipDeclined(this UsersDBEntities DB, int userId, int targetUserId)
-        {
-            FriendShip friendShip = DB.FriendShips.Where(f => (f.UserId == userId && f.TargetUserId == targetUserId)).FirstOrDefault();
-            if (friendShip != null)
-            {
-                return friendShip.Declined;
-            }
-            friendShip = DB.FriendShips.Where(f => (f.UserId == targetUserId && f.TargetUserId == userId)).FirstOrDefault();
-            if (friendShip != null)
-            {
-                return friendShip.Declined;
-            }
-            return false;
-        }
-        public static bool NotFriends(this UsersDBEntities DB, int userId, int targetUserId)
-        {
-            FriendShip friendShipOfUser = DB.FriendShips.Where(f => (f.UserId == userId && f.TargetUserId == targetUserId)).FirstOrDefault();
-            FriendShip friendShipOfTargetUser = DB.FriendShips.Where(f => (f.UserId == targetUserId && f.TargetUserId == userId)).FirstOrDefault();
-            return (friendShipOfUser == null && friendShipOfTargetUser == null);
-        }
-
-        private static int FriendShipStatus(this UsersDBEntities DB, int userId, int targetUserId)
-        {
-            FriendShip friendShipOfUser = DB.FriendShips.Where(f => (f.UserId == userId && f.TargetUserId == targetUserId)).FirstOrDefault();
-            FriendShip friendShipOfTargetUser = DB.FriendShips.Where(f => (f.UserId == targetUserId && f.TargetUserId == userId)).FirstOrDefault();
-            if (friendShipOfUser != null)
-            {
-                if (friendShipOfUser.Accepted)
-                    return 1; // friend
-                if (friendShipOfUser.Declined)
-                    return 2; // targetUser declined
-                return 3; // request friendship pending
-            }
-            if (friendShipOfTargetUser != null)
-            {
-                if (friendShipOfTargetUser.Accepted)
-                    return 1; // friend
-                if (friendShipOfTargetUser.Declined)
-                    return 4; // user declined
-                return 5; // request friendship offer
-            }
-            return 0; // not friend
-        }
-        public static List<FriendShipState> FriendShipsStatus(this UsersDBEntities DB, int userId)
-        {
-            List<FriendShipState> friendShipsStatus = new List<FriendShipState>();
-            foreach (User targetUser in DB.SortedUsers())
-            {
-                if (targetUser.Id != userId)
-                {
-                    friendShipsStatus.Add(new FriendShipState(targetUser, DB.FriendShipStatus(userId, targetUser.Id)));
-                }
-            }
-            return friendShipsStatus;
-        }
-
-        public static bool DeleteFriendShips(this UsersDBEntities DB, int userId)
-        {
-            DB.FriendShips.RemoveRange(DB.FriendShips.Where(f => f.UserId == userId));
-            DB.FriendShips.RemoveRange(DB.FriendShips.Where(f => f.TargetUserId == userId));
-            DB.SaveChanges();
-            return true;
-        }
-
     }
 }

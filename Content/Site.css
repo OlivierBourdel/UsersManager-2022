@@ -22,11 +22,12 @@ select {
     max-width: 280px;
 }
 
-textarea {
+.GroupEmailInput {
     display: block;
     border: 1px solid lightgray;
     border-radius: 4px;
     width: 100% !important;
+    margin-bottom: 20px;
 }
 fieldset {
     display: block;
@@ -84,7 +85,7 @@ legend {
     float: left;
 }
 
-.userContainer {
+.userListContainer {
     display: grid;
     grid-template-columns: 220px 100px 80px 80px 120px 80px 80px 80px;
     height: 60px;
@@ -110,20 +111,4 @@ legend {
 
 .UploadedImage:hover {
     border: 2px solid blue;
-}
-
-.glyphiconStyle {
-    font-size:18px
-}
-
-.glyphicon-green {
-    color: green;
-}
-
-.glyphicon-red {
-    color: red;
-}
-
-.glyphicon-active {
-    cursor: pointer;
 }

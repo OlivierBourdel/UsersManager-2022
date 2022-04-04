@@ -34,17 +34,8 @@
     </select>
 }
 
-@helper GlyphiconNoAction(string glyphiconClass, string TooltipMessage, string ToolTipPlacement = "bottom")
-{
-    <span class="glyphicon glyphiconStyle @glyphiconClass"
-          title="@TooltipMessage"
-          data-placement="@ToolTipPlacement">
-    </span>
-}
-
 @helper GlyphiconAction(string Action, string glyphiconClass, string TooltipMessage, string ToolTipPlacement = "bottom")
 {
-    glyphiconClass += " glyphicon-active";
     var Url = new System.Web.Mvc.UrlHelper(HttpContext.Current.Request.RequestContext);
     <a href="@Url.Action(Action)" style="text-decoration:none">
         <span class="glyphicon glyphiconStyle @glyphiconClass"
@@ -56,40 +47,11 @@
 
 @helper GlyphiconConfirmAction(string Action, string glyphiconClass, string TooltipMessage, string ToolTipPlacement = "bottom")
 {
-    glyphiconClass += " glyphicon-active";
     //// http://bootboxjs.com/documentation.html#bb-confirm
     var Url = new System.Web.Mvc.UrlHelper(HttpContext.Current.Request.RequestContext);
     var root = Url.Action("/");
     var action = root + Action;
     <div onclick='bootbox.confirm("@TooltipMessage", function(result){ if (result) window.location = "@action"; })'>
-        <span class="glyphicon glyphiconStyle @glyphiconClass"
-              title="@TooltipMessage"
-              data-placement="@ToolTipPlacement">
-        </span>
-    </div>
-}
-
-@helper GlyphiconAjaxControllerAction(string controller, string Action, string glyphiconClass, string TooltipMessage, string ToolTipPlacement = "bottom")
-{
-    glyphiconClass += " glyphicon-active";
-    var Url = new System.Web.Mvc.UrlHelper(HttpContext.Current.Request.RequestContext);
-    <div onclick='ajaxActionCall("@Url.Action(Action, controller)")'>
-        <div style="margin-top:12px;margin-left:12px">
-            <span class="glyphicon glyphiconStyle @glyphiconClass"
-                  title="@TooltipMessage"
-                  data-placement="@ToolTipPlacement">
-            </span>
-        </div>
-    </div>
-}
-
-@helper GlyphiconConfirmAjaxAction(string Action, string glyphiconClass, string TooltipMessage, string ToolTipPlacement = "bottom")
-{
-    glyphiconClass += " glyphicon-active";
-    var Url = new System.Web.Mvc.UrlHelper(HttpContext.Current.Request.RequestContext);
-    var root = Url.Action("/");
-    var action = root + Action;
-    <div onclick='bootbox.confirm("@TooltipMessage", function(result) { if (result) ajaxActionCall("@action") })'>
         <span class="glyphicon glyphiconStyle @glyphiconClass"
               title="@TooltipMessage"
               data-placement="@ToolTipPlacement">
@@ -216,14 +178,6 @@
     }
 
     var iconUrl = Url.Content(icon);
-    <img src="@iconUrl" class="small_icon" />
-}
-
-@helper TimeOutIcon()
-{
-    var Url = new System.Web.Mvc.UrlHelper(HttpContext.Current.Request.RequestContext);
-
-    var iconUrl = Url.Content("~/Content/UI-icons/timeout.png");
     <img src="@iconUrl" class="small_icon" />
 }
 

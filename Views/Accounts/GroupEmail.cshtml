@@ -1,17 +1,10 @@
 ﻿@model UsersManager.Models.GroupEmail
-@{
-    ViewBag.Title = "EmailGroup";
-}
-
-<h2>Envoi de courriel</h2>
-<hr />
-@using (Html.BeginForm())
+…
+@using(Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-
     <fieldset style="width:275px">
         <legend>Destinataires</legend>
-
         <div style="margin-bottom:10px; display:grid; grid-template-columns:120px 10px 120px">
             <button id="SelectAll">Tous</button>
             <div></div>
@@ -23,21 +16,17 @@
         <div id="Error_SelectedUsers" style="display:none" class="text-danger">Veuillez faire une sélection</div>
     </fieldset>
 
-    <fieldset>
+    <fieldset style="width:275px">
         <legend>Courriel</legend>
-        @Html.EditorFor(model => model.Subject, new { htmlAttributes = new { @class = "form-control", placeholder = @Html.DisplayNameFor(model => model.Subject) } })
-        @Html.ValidationMessageFor(model => model.Subject, "", new { @class = "text-danger" })
-        <br />
-        @Html.TextAreaFor(model => model.Message, 10, 350, new { @class = "form-control", placeholder = @Html.DisplayNameFor(model => model.Message) })
-        @Html.ValidationMessageFor(model => model.Message, "", new { @class = "text-danger" })
-
+        <div>
+            @Html.TextBoxFor(model => model.Subject, new { placeholder = "Sujet", @class = "GroupEmailInput" })
+        </div>
+        <div>
+            @Html.TextAreaFor(model => model.Message, new { placeholder = "Message", @class = "GroupEmailInput" })
+        </div>
     </fieldset>
-    <div class="form-group">
-        <input type="submit" value="Envoyer" class="btn btn-default" />
-    </div>
+    <input type="submit" value="Envoyer" class="btn btn-default" />
 }
-
-
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
     <script defer>
@@ -53,7 +42,6 @@
             return oneSelected;
         }
         $("input[type='checkbox'][name='SelectedUsers']").change(function () { validateSelection(); });
-
         $("form").submit(function () {
             return validateSelection();
         })

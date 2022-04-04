@@ -11,16 +11,19 @@ namespace UsersManager.Models
     {
         public User()
         {
-            //this.Logins = new HashSet<Login>();
             CreationDate = DateTime.Now;
             UserTypeId = 3; // User
             Verified = false;
             Blocked = false;
+            InitAvatarManagement();
         }
 
-        private static ImageGUIDReference AvatarReference = 
-            new ImageGUIDReference(@"/ImagesData/Avatars/", @"no_avatar.png", false);
-
+        public void InitAvatarManagement()
+        {
+            AvatarReference = new ImageGUIDReference(@"/ImagesData/Avatars/", @"no_avatar.png");
+            AvatarReference.MaxSize = 512;
+            AvatarReference.HasThumbnail = false;
+        }
         public String GetAvatarURL()
         {
             return AvatarReference.GetURL(Avatar, false);
@@ -36,6 +39,7 @@ namespace UsersManager.Models
 
         public string ConfirmEmail { get; set; }
         public string ConfirmPassword { get; set; }
+        private ImageGUIDReference AvatarReference { get; set; }
 
         [Display(Name = "Avatar")]
         public string AvatarImageData { get; set; }
@@ -47,7 +51,7 @@ namespace UsersManager.Models
         {
             if (showGender)
             {
-                if (Gender.Name != "Neutre")
+                if (Gender.Name != "")
                     return Gender.Name + " " + LastName;
             }
             return FirstName + " " + LastName;

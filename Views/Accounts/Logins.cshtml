@@ -1,0 +1,54 @@
+﻿@model IEnumerable<UsersManager.Models.Login>
+@using UsersManager.Models;
+@{
+    UsersDBEntities DB = new UsersDBEntities();
+}
+
+
+@{
+    ViewBag.Title = "Historique des Logins";
+}
+
+<h2>Historique des Logins</h2>
+
+@{
+    List<Login> loginsByDate = DB.Logins.ToList().OrderByDescending(l => l.LoginDate).ToList();
+    DateTime dateGroup = DateTime.MinValue;
+    string date = null;
+}
+@foreach(var item in loginsByDate)
+{
+    User user = DB.Users.Find(item.UserId);
+
+    date = item.LoginDate.ToShortDateString();
+
+    if(dateGroup.Date != item.LoginDate.Date)
+    {
+        dateGroup = item.LoginDate;
+        <hr />
+        <span value="@date" style="display: flex; gap:5px">
+            @Html.Raw(date)
+            @Helper.GlyphiconConfirmAction("Logins/?date=" + date, "glyphicon-remove-circle", "Effacer l'historique de " + date + "?")
+        </span>
+        <hr />
+    }
+
+    <div class="userListContainer">
+        <span>
+            <a href="@user.Email">
+                @Helper.AvatarUser(user)
+            </a>
+        </span>
+        @{ 
+            string login = item.LoginDate.ToShortTimeString();
+            string logout = item.LogoutDate.ToShortTimeString();
+        }  
+        <span>
+            @login
+        </span>
+        <span>
+            @(logout == login ? "-" : logout)
+        </span>
+    </div>
+}
+

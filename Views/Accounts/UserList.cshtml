@@ -1,43 +1,97 @@
-﻿@{
+﻿@model IEnumerable<UsersManager.Models.User>
+
+@{
     ViewBag.Title = "UserList";
 }
 
 <h2>Liste des usagers</h2>
 <hr />
-<div class="userContainer" style="font-size:18px; font-weight:bold">
+<div class="userListContainer" style="font-size:18px; font-weight:bold">
     <div>Usager</div>
     <div style="text-align:center">Connecté</div>
     <div style="text-align:center">Droits</div>
 
-    <div style="text-align:center">Genre</div>
+    <div style="text-align:center">@Html.DisplayNameFor(model => model.GenderId)</div>
     <div>Création</div>
     <div style="text-align:center">Vérifié</div>
     <div style="text-align:center">Bloqué</div>
     <div></div>
 </div>
 
-<div id="UsersListContainer">
-    @{ Html.RenderAction("GetUsersList", new { forceRefresh = true }); }
-</div>
+@foreach (var item in Model)
+{
+    var emailReference = "mailto:" + item.Email;
+    <div class="userListContainer" style="font-size:18px;">
+        <div>
+            <a href="@emailReference">
+                @Helper.AvatarUser(item)
+            </a>
+        </div>
+
+        <div style="text-align:center">
+            @Helper.OnLineStatusIcon(UsersManager.Models.OnlineUsers.IsOnLine(item.Id), item.Blocked)
+        </div>
+        <div style="text-align:center">
+            @Helper.UserTypeIcon(item.UserTypeId)
+        </div>
+        <div style="text-align:center">
+            @Helper.GenderIcon(item.GenderId)
+        </div>
+        <div>
+            @Html.DisplayFor(modelItem => item.CreationDate)
+        </div>
+        <div style="text-align:center">
+            @Helper.Checked(item.Verified)
+        </div>
+        <div style="text-align:center">
+            @if (!item.IsAdmin)
+            {
+                if (item.Blocked)
+                {
+                    <input type="checkbox" id="blocked_@item.Id" class="CB_Blocked" checked />
+                }
+                else
+                {
+                    <input type="checkbox" id="blocked_@item.Id" class="CB_Blocked" />
+                }
+            }
+            else
+            {
+                <div></div>
+            }
+        </div>
+        <div>
+            @if (!item.IsAdmin)
+            {
+                @Helper.GlyphiconConfirmAction("Delete/" + item.Id.ToString(), "glyphicon-remove-circle", "Effacer l'usager " + item.GetFullName() + "...")
+            }
+            else
+            {
+                <div></div>
+            }
+        </div>
+    </div>
+}
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
-    @Scripts.Render("~/bundles/partialRefresh")
+    <script defer>
+        setInterval(function () { RefreshIfNeeded(); }, 2000);
+        $(".CB_Blocked").change(
+            function () {
+                let userid = this.id.split('_')[1];
+                window.location = "@Url.Action("ChangeUserBlockedStatus")" + "?userid=" + userid + "&blocked=" + this.checked.toString();
+            });
 
-    <script>
-        $(() => {
-            UpdateCheckboxChangeCallback();
-            installPartialRefresh("@Url.Action("GetUsersList")", "UsersListContainer", 3 /*secondes*/, UpdateCheckboxChangeCallback);
-           
-            function UpdateCheckboxChangeCallback() {
-                // renew checkbox change call back
-                $(".CB_Blocked").change(
-                    function () {
-                        let userid = this.id.split('_')[1];
-                        ajaxActionCall("@Url.Action("ChangeUserBlockedStatus")" + "?userid=" + userid + "&blocked=" + this.checked.toString());
-                    }
-                );
-            }
-        });
+    function RefreshIfNeeded() {
+            $.ajax({
+                url: "@Url.Action("NeedUpdate")",
+                method: 'GET',
+                success: (needUpdate) => {
+                    if (needUpdate)
+                        window.location = "@Url.Action("UserList")";
+                }
+            });
+        }
     </script>
 }

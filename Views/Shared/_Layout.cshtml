@@ -19,26 +19,26 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                @Html.ActionLink("UsersManager", "Index", "Application", new { area = "" }, new { @class = "navbar-brand" })
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    @if (currentUser == null)
+                    @if(currentUser == null)
                     {
                         <li>@Html.ActionLink("Se connecter...", "Login", "Accounts")</li>
                     }
                     else
                     {
-                        if (currentUser.IsAdmin)
+                        if(currentUser.IsAdmin)
                         {
+                            <li>@Html.ActionLink("GroupEmail", "GroupEmail", "Accounts")</li>
+                            <li>@Html.ActionLink("Historique Logins", "Logins", "Accounts")</li>
                             <li>@Html.ActionLink("Usagers", "UserList", "Accounts")</li>
-                            <li>@Html.ActionLink("Courriel", "GroupEmail", "Accounts")</li>
-                            <li>@Html.ActionLink("Journal", "LoginsJournal", "Accounts")</li>
                         }
                         <li>  @Helper.AvatarProfilLink(currentUser)</li>
                         <li>@Html.ActionLink("Se déconnecter", "Logout", "Accounts")</li>
                     }
-                    <li>@Html.ActionLink("À propos", "About", "Home")</li>
+                    <li>@Html.ActionLink("À propos", "About", "Application")</li>
                 </ul>
             </div>
         </div>

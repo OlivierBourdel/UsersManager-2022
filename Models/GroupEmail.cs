@@ -1,29 +1,27 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Web;
 
 namespace UsersManager.Models
 {
     public class GroupEmail
     {
         public List<int> SelectedUsers { get; set; }
-
         [Display(Name = "Sujet"), Required(ErrorMessage = "Obligatoire")]
         public string Subject { get; set; }
-
         [Display(Name = "Message"), Required(ErrorMessage = "Obligatoire")]
         public string Message { get; set; }
-
         public void Send(UsersDBEntities DB)
         {
-            if (SelectedUsers != null)
+            foreach(int selectedUser in SelectedUsers)
             {
-                foreach (int userId in SelectedUsers)
-                {
-                    User user = DB.Users.Find(userId);
-                    string personalizedMessage = Message.Replace("[Nom]", user.GetFullName(true)).Replace("\r\n", @"<br>");
-                    Gmail.SMTP.SendEmail(user.GetFullName(), user.Email, Subject, personalizedMessage);
-                }
+                User user = DB.Users.Find(selectedUser);
+                string message = Message.Replace("[Nom]", user.GetFullName(true)).Replace("\r\n", @"<br>");
+                Gmail.SMTP.SendEmail(user.GetFullName(), user.Email, Subject, message);
             }
         }
     }
+
 }

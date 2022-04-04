@@ -30,29 +30,13 @@ namespace UsersManager.Models
             this.HasThumbnail = hasThumbnail;
         }
 
-        public String MakeUrl(String GUID, bool thumbnail = false)
+        public String GetURL(String GUID, bool thumbnail = false)
         {
             String url;
-
             if (String.IsNullOrEmpty(GUID))
                 url = "~" + BasePath + DefaultImage;
             else
                 url = "~" + BasePath + (thumbnail ? @"Thumbnails/" : "") + GUID + "." + imageFormat.ToString();
-
-            return url;
-        }
-        public String GetURL(String GUID, bool thumbnail = false)
-        {
-            String url = MakeUrl(GUID, thumbnail);
-
-            if (thumbnail)
-            {
-                string imagePath = HttpContext.Current.Server.MapPath(url);
-                if (!File.Exists(imagePath))
-                {
-                    url = MakeUrl(GUID);
-                }
-            }
             return url;
         }
         public static Image ScaleImage(Image image, int maxWidth, int maxHeight)
@@ -83,14 +67,11 @@ namespace UsersManager.Models
             if (mime.IndexOf("webp") != -1)
             {
                 // La classe Image ne supporte pas le format webp. Du coup pas possible de manipuler l'échelle pour créer un miniature.
-                if (!thumbnail)
-                {
-                    var stream = new MemoryStream(Convert.FromBase64String(data));
-                    FileStream file = new FileStream(HttpContext.Current.Server.MapPath(MakeUrl(GUID)), FileMode.Create, FileAccess.Write);
-                    stream.WriteTo(file);
-                    file.Close();
-                    stream.Close();
-                }
+                var stream = new MemoryStream(Convert.FromBase64String(data));
+                FileStream file = new FileStream(HttpContext.Current.Server.MapPath(GetURL(GUID, thumbnail)), FileMode.Create, FileAccess.Write);
+                stream.WriteTo(file);
+                file.Close();
+                stream.Close();
             }
             else
             {
@@ -103,9 +84,9 @@ namespace UsersManager.Models
                 // Limit size of image
                 if ((original.Size.Width > maxSize) || (original.Size.Height > maxSize))
                     original = ScaleImage(original, maxSize, maxSize);
-                original.Save(HttpContext.Current.Server.MapPath(MakeUrl(GUID, thumbnail)), overrideFormat);
+                original.Save(HttpContext.Current.Server.MapPath(GetURL(GUID, thumbnail)), overrideFormat);
             }
-
+           
         }
         public String SaveImage(string ImageData, String PreviousGUID = "")
         {
@@ -115,16 +96,16 @@ namespace UsersManager.Models
                 String GUID = "";
                 if (!String.IsNullOrEmpty(PreviousGUID))
                 {
-                    System.IO.File.Delete(HttpContext.Current.Server.MapPath(MakeUrl(PreviousGUID)));
+                    System.IO.File.Delete(HttpContext.Current.Server.MapPath(GetURL(PreviousGUID)));
                     if (HasThumbnail)
-                        System.IO.File.Delete(HttpContext.Current.Server.MapPath(MakeUrl(PreviousGUID, true /*thumbnail*/)));
+                        System.IO.File.Delete(HttpContext.Current.Server.MapPath(GetURL(PreviousGUID, true /*thumbnail*/)));
                 }
                 do
                 {
                     GUID = Guid.NewGuid().ToString();
                     imagePath = HttpContext.Current.Server.MapPath(GetURL(GUID));
                     // make sure new GUID does not already exists 
-                } while (File.Exists(imagePath)); 
+                } while (File.Exists(imagePath));
 
                 SaveImageFile(GUID, ImageData);
                 if (HasThumbnail)
@@ -138,9 +119,9 @@ namespace UsersManager.Models
         {
             if (!String.IsNullOrEmpty(GUID))
             {
-                System.IO.File.Delete(HttpContext.Current.Server.MapPath(MakeUrl(GUID)));
+                System.IO.File.Delete(HttpContext.Current.Server.MapPath(GetURL(GUID)));
                 if (HasThumbnail)
-                    System.IO.File.Delete(HttpContext.Current.Server.MapPath(MakeUrl(GUID, true /* thumbnail */)));
+                    System.IO.File.Delete(HttpContext.Current.Server.MapPath(GetURL(GUID, true /* thumbnail */)));
             }
         }
     }

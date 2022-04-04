@@ -14,5 +14,10 @@ namespace UsersManager.Controllers
         {
             return View();
         }
+
+        public ActionResult About()
+        {
+            return View();
+        }
     }
 }

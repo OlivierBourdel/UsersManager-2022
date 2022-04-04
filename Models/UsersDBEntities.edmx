@@ -5,17 +5,6 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="UsersDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-        <EntityType Name="FriendShips">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="UserId" Type="int" Nullable="false" />
-          <Property Name="TargetUserId" Type="int" Nullable="false" />
-          <Property Name="CreationDate" Type="datetime" Nullable="false" />
-          <Property Name="Accepted" Type="bit" Nullable="false" />
-          <Property Name="Declined" Type="bit" Nullable="false" />
-        </EntityType>
         <EntityType Name="Genders">
           <Key>
             <PropertyRef Name="Id" />
@@ -72,7 +61,7 @@
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
         </EntityType>
-        <Association Name="FK__Logins__UserId__607251E5">
+        <Association Name="FK__Logins__UserId__3C34F16F">
           <End Role="Users" Type="Self.Users" Multiplicity="1" />
           <End Role="Logins" Type="Self.Logins" Multiplicity="*" />
           <ReferentialConstraint>
@@ -109,14 +98,13 @@
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="UsersDBModelStoreContainer">
-          <EntitySet Name="FriendShips" EntityType="Self.FriendShips" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Genders" EntityType="Self.Genders" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Logins" EntityType="Self.Logins" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ResetPasswordCommands" EntityType="Self.ResetPasswordCommands" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="UnverifiedEmails" EntityType="Self.UnverifiedEmails" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Users" EntityType="Self.Users" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="UserTypes" EntityType="Self.UserTypes" Schema="dbo" store:Type="Tables" />
-          <AssociationSet Name="FK__Logins__UserId__607251E5" Association="Self.FK__Logins__UserId__607251E5">
+          <AssociationSet Name="FK__Logins__UserId__3C34F16F" Association="Self.FK__Logins__UserId__3C34F16F">
             <End Role="Users" EntitySet="Users" />
             <End Role="Logins" EntitySet="Logins" />
           </AssociationSet>
@@ -158,7 +146,7 @@
           <Property Name="Blocked" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="Gender" Relationship="Self.FK_Users_Genders" FromRole="Users" ToRole="Genders" />
           <NavigationProperty Name="UserType" Relationship="Self.FK_Users_UserTypes" FromRole="Users" ToRole="UserTypes" />
-          <NavigationProperty Name="Logins" Relationship="UsersDBModel.FK_Logins_Users" FromRole="User" ToRole="Login" />
+          <NavigationProperty Name="Logins" Relationship="UsersDBModel.FK__Logins__UserId__3C34F16F" FromRole="User" ToRole="Login" />
         </EntityType>
         <EntityType Name="UserType">
           <Key>
@@ -207,11 +195,10 @@
           <EntitySet Name="UnverifiedEmails" EntityType="UsersDBModel.UnverifiedEmail" />
           <EntitySet Name="ResetPasswordCommands" EntityType="UsersDBModel.ResetPasswordCommand" />
           <EntitySet Name="Logins" EntityType="UsersDBModel.Login" />
-          <AssociationSet Name="FK_Logins_Users" Association="UsersDBModel.FK_Logins_Users">
+          <AssociationSet Name="FK__Logins__UserId__3C34F16F" Association="UsersDBModel.FK__Logins__UserId__3C34F16F">
             <End Role="User" EntitySet="Users" />
             <End Role="Login" EntitySet="Logins" />
           </AssociationSet>
-          <EntitySet Name="FriendShips" EntityType="UsersDBModel.FriendShip" />
         </EntityContainer>
         <EntityType Name="UnverifiedEmail">
           <Key>
@@ -238,9 +225,9 @@
           <Property Name="UserId" Type="Int32" Nullable="false" />
           <Property Name="LoginDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="LogoutDate" Type="DateTime" Nullable="false" Precision="3" />
-          <NavigationProperty Name="User" Relationship="UsersDBModel.FK_Logins_Users" FromRole="Login" ToRole="User" />
+          <NavigationProperty Name="User" Relationship="UsersDBModel.FK__Logins__UserId__3C34F16F" FromRole="Login" ToRole="User" />
         </EntityType>
-        <Association Name="FK_Logins_Users">
+        <Association Name="FK__Logins__UserId__3C34F16F">
           <End Type="UsersDBModel.User" Role="User" Multiplicity="1" />
           <End Type="UsersDBModel.Login" Role="Login" Multiplicity="*" />
           <ReferentialConstraint>
@@ -252,17 +239,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityType Name="FriendShip">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="UserId" Type="Int32" Nullable="false" />
-          <Property Name="TargetUserId" Type="Int32" Nullable="false" />
-          <Property Name="CreationDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="Accepted" Type="Boolean" Nullable="false" />
-          <Property Name="Declined" Type="Boolean" Nullable="false" />
-        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -326,18 +302,6 @@
               <MappingFragment StoreEntitySet="Logins">
                 <ScalarProperty Name="LogoutDate" ColumnName="LogoutDate" />
                 <ScalarProperty Name="LoginDate" ColumnName="LoginDate" />
-                <ScalarProperty Name="UserId" ColumnName="UserId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="FriendShips">
-            <EntityTypeMapping TypeName="UsersDBModel.FriendShip">
-              <MappingFragment StoreEntitySet="FriendShips">
-                <ScalarProperty Name="Declined" ColumnName="Declined" />
-                <ScalarProperty Name="Accepted" ColumnName="Accepted" />
-                <ScalarProperty Name="CreationDate" ColumnName="CreationDate" />
-                <ScalarProperty Name="TargetUserId" ColumnName="TargetUserId" />
                 <ScalarProperty Name="UserId" ColumnName="UserId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>

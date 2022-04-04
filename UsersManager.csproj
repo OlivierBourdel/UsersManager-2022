@@ -131,14 +131,11 @@
     <Compile Include="Controllers\ApplicationController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\AccountsController.cs" />
+    <Compile Include="Controllers\LoginsController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\EmailView.cs" />
-    <Compile Include="Models\FriendShip.cs">
-      <DependentUpon>UsersDBEntities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\FriendShipState.cs" />
     <Compile Include="Models\GroupEmail.cs" />
     <Compile Include="Models\ImageGUIDReference.cs" />
     <Compile Include="Models\Login.cs">
@@ -197,27 +194,15 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\UI-icons\Abort.png" />
     <Content Include="Content\UI-icons\Accept.png" />
-    <Content Include="Content\UI-icons\admin.png" />
     <Content Include="Content\UI-icons\Blocked.png" />
-    <Content Include="Content\UI-icons\female.png" />
-    <Content Include="Content\UI-icons\male.png" />
     <Content Include="Content\UI-icons\Masked.png" />
-    <Content Include="Content\UI-icons\neutral.png" />
     <Content Include="Content\UI-icons\OffLine.png" />
     <Content Include="Content\UI-icons\OnLine.png" />
-    <Content Include="Content\UI-icons\power user.png" />
-    <Content Include="Content\UI-icons\timeout.png" />
     <Content Include="Content\UI-icons\UnBlocked.png" />
-    <Content Include="Content\UI-icons\user.png" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
-    <Content Include="ImagesData\Avatars\0e99d0c8-febb-4b40-ac49-7615fcf00d36.Jpeg" />
-    <Content Include="ImagesData\Avatars\321e0916-159b-4917-b198-429de8b88f5d.Jpeg" />
-    <Content Include="ImagesData\Avatars\68a446cd-638e-4d32-8c09-48fa0f7177fe.Jpeg" />
-    <Content Include="ImagesData\Avatars\92a1d624-503b-4630-b573-683d6574fce1.Jpeg" />
-    <Content Include="ImagesData\Avatars\c8ee1674-92ed-4e6e-b922-a93a249ea07b.Jpeg" />
     <Content Include="ImagesData\Avatars\no_avatar.png" />
     <Content Include="ImagesData\Loading_icon.gif" />
     <Content Include="Models\UsersDBEntities.Context.tt">
@@ -242,7 +227,6 @@
       <DependentUpon>UsersDBEntities.edmx</DependentUpon>
     </Content>
     <Content Include="App_Code\Helper.cshtml" />
-    <Content Include="Rafraîchissement partiel périodique.pdf" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\FormUtilities.js" />
     <Content Include="Scripts\imageUploader.js" />
@@ -256,7 +240,6 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
-    <Content Include="Scripts\PartialRefresh.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -268,7 +251,7 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="Views\Home\About.cshtml" />
+    <Content Include="Views\Application\About.cshtml" />
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Accounts\Subscribe.cshtml" />
@@ -286,10 +269,8 @@
     <Content Include="Views\Accounts\ResetPassword.cshtml" />
     <Content Include="Views\Accounts\ResetPasswordSuccess.cshtml" />
     <Content Include="Views\Accounts\ResetPasswordError.cshtml" />
+    <Content Include="Views\Accounts\Logins.cshtml" />
     <Content Include="Views\Accounts\GroupEmail.cshtml" />
-    <Content Include="Views\Accounts\LoginsJournal.cshtml" />
-    <Content Include="Views\Accounts\GetUsersList.cshtml" />
-    <Content Include="Views\Accounts\GetLoginsList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />

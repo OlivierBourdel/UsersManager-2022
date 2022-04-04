@@ -34,8 +34,7 @@ namespace UsersManager.Controllers
         public ActionResult Subscribe()
         {
             ViewBag.Genders = SelectListItemConverter<Gender>.Convert(DB.Genders.ToList());
-            User user = new User();
-            return View(user);
+            return View(new User());
         }
         [HttpPost]
         public ActionResult Subscribe(User user)
@@ -298,7 +297,7 @@ namespace UsersManager.Controllers
                     return View(loginCredential);
                 }
                 OnlineUsers.AddSessionUser(user.Id);
-                Session["currentLoginId"] = DB.AddLogin(user.Id).Id;
+                DB.Add_Login(user.Id);
                 return RedirectToAction("Index", "Application");
             }
             return View(loginCredential);
@@ -306,51 +305,34 @@ namespace UsersManager.Controllers
 
         public ActionResult Logout()
         {
-            DB.UpdateLogout((int)Session["currentLoginId"]);
+            int? id = OnlineUsers.GetSessionUser().Id;
+            if (id != null)
+            {
+                DB.Update_Login((int)id);
+            }
             OnlineUsers.RemoveSessionUser();
             return RedirectToAction("Login");
         }
         #endregion
 
-        #region Administrator actions
-        public JsonResult NeedUpdate()
-        {
-            return Json(OnlineUsers.NeedUpdate(), JsonRequestBehavior.AllowGet);
-        }
+        #region LoginsHistory
         [AdminAccess]
-        public ActionResult UserList()
+        public ActionResult Logins(string date)
         {
-            return View();
-        }
-
-        [AdminAccess]
-        public ActionResult ChangeUserBlockedStatus(int userid, bool blocked)
-        {
-            User user = DB.FindUser(userid);
-            user.Blocked = blocked;
-            DB.Update_User(user);
-            return null;
-        }
-
-        [AdminAccess]
-        public ActionResult Delete(int id)
-        {
-            DB.RemoveUser(id);
-            return RedirectToAction("UserList");
-        }
-
-        [AdminAccess(false)] // RefreshTimout = false otherwise periodical refresh with lead to never timed out session
-        public ActionResult GetUsersList(bool forceRefresh = false)
-        {
-            if (forceRefresh || OnlineUsers.NeedUpdate())
+            if (date != null)
             {
-                return PartialView(DB.SortedUsers());
+                DateTime dateToDelete = DateTime.Parse(date);
+                if(DB.Logins.Select(l => l.LoginDate == dateToDelete) != null)
+                {
+                    UsersDBDAL.DeleteLoginsJournalDay(DB, dateToDelete);
+                }
             }
-            return null;
+            return View(DB.Logins);
         }
         #endregion
 
         #region GroupEmail
+
         [AdminAccess]
         public ActionResult GroupEmail()
         {
@@ -361,7 +343,7 @@ namespace UsersManager.Controllers
         [HttpPost]
         public ActionResult GroupEmail(GroupEmail groupEmail, List<int> SelectedUsers)
         {
-            if (ModelState.IsValid)
+            if(ModelState.IsValid)
             {
                 groupEmail.SelectedUsers = SelectedUsers;
                 groupEmail.Send(DB);
@@ -371,35 +353,36 @@ namespace UsersManager.Controllers
             ViewBag.Users = DB.SortedUsers();
             return View(groupEmail);
         }
+
         #endregion
 
-        #region Login journal
-        [AdminAccess]
-        public ActionResult LoginsJournal()
+        #region Administrator actions
+        public JsonResult NeedUpdate()
         {
-            return View();
-        }
-        [AdminAccess(false)] // RefreshTimout = false otherwise periodical refresh with lead to never timed out session
-        public ActionResult GetLoginsList(bool forceRefresh = false)
-        {
-            if (forceRefresh || OnlineUsers.NeedUpdate())
-            {
-                ViewBag.LoggedUsersId = new List<int>(OnlineUsers.UsersId);
-                return PartialView(DB.Logins.OrderByDescending(l => l.LoginDate));
-            }
-            return null;
+            return Json(OnlineUsers.NeedUpdate(), JsonRequestBehavior.AllowGet);
         }
         [AdminAccess]
-        public ActionResult DeleteJournalDay(string day)
+        public ActionResult UserList()
         {
-            try
-            {
-                DateTime date = DateTime.Parse(day);
-                DB.DeleteLoginsJournalDay(date);
-            }
-            catch (Exception) { }
-            return RedirectToAction("LoginsJournal");
+            return View(DB.Users);
+        }
+
+        [AdminAccess]
+        public ActionResult ChangeUserBlockedStatus(int userid, bool blocked)
+        {
+            User user = DB.FindUser(userid);
+            user.Blocked = blocked;
+            DB.Update_User(user);
+            return RedirectToAction("UserList");
+        }
+
+        [AdminAccess]
+        public ActionResult Delete(int id)
+        {
+            DB.RemoveUser(id);
+            return RedirectToAction("UserList");
         }
         #endregion
+
     }
 }

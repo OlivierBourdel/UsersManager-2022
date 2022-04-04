@@ -14,6 +14,16 @@ namespace UsersManager.Models
     
     public partial class Login
     {
+        public Login()
+        {
+
+        }
+        public Login(int id)
+        {
+            UserId = id;
+            LoginDate = DateTime.Now;
+            LogoutDate = DateTime.Now;
+        }
         public int Id { get; set; }
         public int UserId { get; set; }
         public System.DateTime LoginDate { get; set; }
